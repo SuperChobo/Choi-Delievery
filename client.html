@@ -3,92 +3,106 @@
 <head>
 	<title>슈퍼개미 최배달</title>
 	<meta charset="UTF-8">
-	<style>
-		@viewport {width: device-width;}
-		div {overflow: auto;}
-		#center {text-align: center;}
-		#maincall {
-			display: table;
-			width: 90vw;
-			max-width: 800px;
-		}
-		#autowidth {
-			width: 90vw;
-			max-width: 800px;
-			min-width: 620px;
-			padding: 10px;
-			margin: 10px;
-		}
-		#minbody{
-			min-width: 600px;
-		}
-		.menulist {
-			display: table-cell;
-		}
-		.topper {
-			height: 50px;
-			border : 3px double blue;
-		}
-		.wrapper {
-			height: auto;
-		}
-		.section { 
-			width: 60%;
-			min-width: 300px;
-			height: 300px;
-			max-height: 400px;
-			padding: 10px;
-			border: 3px double green;
-			border-radius: 15px;
-			margin-right: 10px;
-			overflow: auto;
-			float: left;
-		}
-		.aside {
-			width: 26%;
-			height: 300px;
-			padding: 10px;
-			border: 3px double lime;
-			margin-left: 10px;
-			float: right;
-		}
-		.footer {
-			height: 80px;
-			border: 3px solid red;
-		}
-	</style>
+    <style>
+        @viewport {width: device-width;}
+        div {overflow: auto;}
+        #autowidth{
+            width: 90vw;
+            max-width: 800px;
+            min-width: 400px;
+            padding: 8px;
+            margin: 10px;
+        }
+        .header{
+            text-align: center;
+            font-weight: bold;
+            font-size: 24pt;
+        }
+        .menu{
+            height: auto;
+            border: 3px double blue;
+            background-color: darkblue;
+            display: table;
+        }
+        .menu_inner {
+            text-align: center;
+            display: table-cell;
+        }
+        .menu .button{
+            text-align: center;
+            border: 2px solid black;
+            background-color: lightblue;
+            padding: 2px 5px; 
+            margin: 0 5px;
+            display: inline-block;
+        }
+        .wrapper{
+            height: auto;
+            border: 1px solid darkgreen;
+            background-color: darkgreen;
+        }
+        .wrapper .section{
+            width: 70%;
+            height: 300px;
+            border: 3px double lightgreen;
+            border-radius: 15px;
+            background-color: white;
+            float: left;
+        }
+        .wrapper .aside{
+            width: 25%;
+            height: 300px;
+            border: 3px double lime;
+            background-color: white;
+            float: right;
+        }
+        .footer{
+            height: auto;
+            border: 3px solid darkred;
+            background-color: lightpink;
+        }
+    </style>
 </head>
-<body id="minbody">
-	<script type="text/javascript" src="text.js">
-		moveTo(0,0);
-		resizeTo(140,425);
-	</script>
-	<header>
-		<div id="center">
-			<h1>슈퍼개미 최배달<h1>
-		</div>
-		<div id="maincall">
-			<a class="manulist">메인메뉴</a>
-			<a class="manulist">서브메뉴</a>
-		</div>
-		<br>
-	</header>
-	<hr/>
-	<div id="autowidth" class="topper">
-	</div>
-	<div id="autowidth" class="wrapper">
-		<div class="section">
-		</div>
-		<div class="aside">
-		</div>
-	</div>
-	<div id="autowidth" class="footer">
-		<form>
-			<textarea rows="3" cols= "50" placeholder="메모작성구간" required="required"></textarea>
-			<br>
-			<input type="submit" value="전송">
-			<input type="reset" value="지우기">
-		</form>
-	</div>
+<body>
+    <script type="text/javascript" src="text.js">
+    </script>
+    <div>
+        <div class="header" id="autowidth">슈퍼개미 최배달</div>
+    </div>
+    <div class="menu" id="autowidth">
+        <div class="menu_inner">
+            <div class="button">
+                메뉴1
+            </div>
+            <div class="button">
+                메뉴2
+            </div>
+            <div class="button">
+                메뉴3
+            </div>
+            <div class="button">
+                메뉴4
+            </div>
+            <div class="button">
+                메뉴5
+            </div>
+        </div>
+    </div>
+    <div class="wrapper" id="autowidth">
+        <div class="section">
+
+        </div>
+        <div class="aside">
+
+        </div>
+    </div>
+    <div class="footer" id="autowidth">
+        <form>
+            <textarea rows="3" cols="50" placeholder="메모작성구간" required="required"></textarea>
+            <br>
+            <input type="submit" value="전송">
+            <input type="reset" value="지우기">
+        </form>
+    </div>
 </body>
-<html>
+</html>
