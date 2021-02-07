@@ -1,79 +1,92 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>주식왕최배달</title>
+	<title>슈퍼개미 최배달</title>
 	<meta charset="UTF-8">
-	<style>
-		@viewport {width: device-width;}
-		.lef {float: left;}
-		.rig {float: right;}
-		.cen {float: center;}
-		.fix {overflow: auto;}
-		div {
-			width: 90vw;
-			height: 50px;
-			border : 3px double blue;
-			padding: 10px;
-			margin: 10px;
-		}
-		aside {
-			width: 20vw; 
-			height: 200px;
-			padding: 10px;
-			border: 3px double lime;
-			margin: 10px;
-		}
-		section { 
-			width: 60vw;
-			height: 200px;
-			max-height: 400px;
-			padding: 10px;
-			border: 3px double green;
-			border-radius: 15px;
-			margin: 10px;
-			resize: both;
-			overflow: auto;
-		}
-		footer {
-			width: 90vw;
-			min-width: 350px;
-			height: 95px;
-			padding: 10px;
-			border: 3px solid red;
-			margin: 10px;
-			overflow: auto;
-		}
-	</style>
+    <style>
+        @viewport {width: device-width;}
+        div {overflow: auto;}
+        #autowidth{
+            width: 90vw;
+            max-width: 800px;
+            min-width: 620px;
+            padding: 10px;
+            margin: 10px;
+        }
+        #minbody{
+
+        }
+        .header .logo{
+
+        }
+        .header .menu{
+
+        }
+        .header .menu .button{
+
+        }
+        .topper{
+            height: 50px;
+            border: 3px double blue;
+        }
+        .wrapper{
+            height: 300px;
+            padding: 0;
+        }
+        .wrapper .section{
+            width: 60%;
+            border: 3px double green;
+            border-radius: 15px;
+            margin: 0 10px 0 0 ;
+            float: left;
+        }
+        .wrapper .aside{
+            width: 25%;
+            border: 3px double lime;
+            margin: 0 0 0 10px ;
+            float: left;
+        }
+        .footer{
+            height: 80px;
+            border: 3px solid red;
+        }
+    </style>
 </head>
 <body>
-	<script type="text/javascript" src="text.js"></script>
-	<script language=javascript>
-		moveTo(0,0);
-		resizeTo(140,425);
-	</script>
-	<header>
-		<center>
-			<h1>주식왕 최배달<h1>
-		</center>
-		<nav class="lef">메인메뉴</nav>
-		<nav class="lef">서브메뉴</nav>
-		<br>
-	</header>
-	<hr/>
-	<div class="cen", "fix">
-	</div>
-	<section class="lef", "fix">
-	</section>
-	<aside class="rig", "fix">
-	</aside>
-	<br>
-	<footer class="fix">
-		<form>
-			<textarea rows="4" cols="63">메모작성구간</textarea>
-			<br>
-			<input type="submit" value="전송">
-			<input type="reset" value="지우기">
-		</form>
-	</footer>
+    <script type="text/javascript" src="text.js">
+    </script>
+    <div>
+        <div class="logo">
+            <h1>슈퍼개미 최배달</h1>
+        </div>
+        <div class="menu">
+            <div class="button">
+                메인메뉴
+            </div>
+            <div class="button">
+                서브메뉴
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="topper">
+
+    </div>
+    <div class="wrapper">
+        <div class="section">
+
+        </div>
+        <div class="aside">
+
+        </div>
+    </div>
+    <div class="footer">
+        <form>
+            <textarea rows="3" cols="50" placeholder="메모작성구간" required="required"></textarea>
+            <br>
+            <input type="submit" value="전송">
+            <input type="reset" value="지우기">
+        </form>
+    </div>
 </body>
-<html>
+</html>
