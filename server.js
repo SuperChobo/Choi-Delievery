@@ -110,6 +110,10 @@ app.get('/mainIO', function(req, res){
     res.sendFile(__dirname + '/main_io.js');
 });
 
+app.get('/mainFlow', function(req, res){
+    res.sendFile(__dirname + '/main_flow.js');
+});
+
 app.get('/test', function(req, res){
     res.sendFile(__dirname + '/test.html');
 });
