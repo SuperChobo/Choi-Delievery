@@ -9,3 +9,5 @@ function stock(){
     this.num;           //num of stocks
     this.totalPrice;   
 }
+
+var socket = io();
