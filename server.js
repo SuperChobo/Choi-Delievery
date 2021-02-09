@@ -31,6 +31,7 @@ function company(name, soundness, vision, tendency, variablilty, category, price
     this.category = category;
 
     this.price = price;
+    this.prevPrice = price;
 }
 
 function stock(){
@@ -183,6 +184,10 @@ io.on('connection', function(socket) {
         userList[i].name = name;
         socket.emit('loginSuccess');
         console.log("로그인 : " + userList[i].socket.handshake.address);
+    })
+
+    socket.on('reqCompanyList', function(){
+        socket.emit('resCompanyList', companyList);
     })
 });
 
