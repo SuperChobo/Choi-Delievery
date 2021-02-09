@@ -33,6 +33,12 @@ function company(name, soundness, vision, tendency, variablilty, category, price
     this.price = price;
 }
 
+function stock(){
+    this.name;
+    this.num;
+    this.totalPrice;
+}
+
 var cateList = ["생필품", "식품", "요식업", "명품", 
                 "철강", "반도체", "배터리", "금속",
                 "원유", "광업", 
@@ -91,12 +97,28 @@ app.get('/main', function(req, res){
     res.sendFile(__dirname + '/client.html');
 });
 
+app.get('/mainVariables', function(req, res){
+    res.sendFile(__dirname + '/main_variables.js');
+});
+
+app.get('/mainCommunication', function(req, res){
+    res.sendFile(__dirname + '/main_communication.js');
+});
+
+app.get('/mainIO', function(req, res){
+    res.sendFile(__dirname + '/main_io.js');
+});
+
 app.get('/test', function(req, res){
     res.sendFile(__dirname + '/test.html');
 });
 
 app.get('/testjs', function(req, res){
     res.sendFile(__dirname + '/test.js');
+});
+
+app.get('/testjs2', function(req, res){
+    res.sendFile(__dirname + '/test2.js');
 });
 
 io.on('connection', function(socket) {
@@ -185,10 +207,6 @@ function checkDisconnect(addr){
     }
 }
 
-//
-//
-//
-
 function strAddrList(){
     if(userList.length == 0)    return ""
     var nameList = [];
@@ -200,10 +218,15 @@ function strAddrList(){
     return nameList.join('<br>');
 }
 
+//
+//  Main Game Flow
+//
+
 function gameInit(){
     addCompany(30); // Num of Company
     setMoney(-1, 100000);
 
+    console.log(userList);
     console.log(companyList);
 }
 
