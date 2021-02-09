@@ -11,6 +11,7 @@ server.listen(3000);
 
 var userList = []; 
 var companyList = [];
+var encounterList = [];
 var isGameStart = false;
 
 function UserInfo(socket){
@@ -40,6 +41,13 @@ function stock(){
     this.totalPrice;
 }
 
+function encounter(category, target, detail, turn){
+    this.category = category;
+    this.target = target;
+    this.detail = detail;
+    this.turn = turn;
+}
+
 var cateList = ["생필품", "식품", "요식업", "명품", 
                 "철강", "반도체", "배터리", "금속",
                 "원유", "광업", 
@@ -61,6 +69,18 @@ app.get('/', function(req, res){
 });
 
 app.get('/login', function(req, res){
+    var tadd = req.ip;
+    var isValid = false;
+    for(i = 0; i < userList.length; i++){
+        if(tadd == userList[i].socket.handshake.address){
+            isValid = true;
+            break;
+        }
+    }
+
+    if(isValid){
+        res.redirect("/lobby");
+    }
     res.sendFile(__dirname + '/login.html');
 });
 
@@ -193,6 +213,12 @@ io.on('connection', function(socket) {
     socket.on('reqCompanyList', function(){
         socket.emit('resCompanyList', companyList);
     })
+    socket.on('reqEncounterList', function(){
+        socket.emit('resEncounterList', encounterList);
+    })
+    socket.on('reqCateList', function(){
+        socket.emit('resCateList', cateList);
+    })
 });
 
 function checkDisconnect(addr){
@@ -233,27 +259,25 @@ function strAddrList(){
 
 function gameInit(){
     addCompany(30); // Num of Company
+    addEncounters(500, 1);
     setMoney(-1, 100000);
 
-    console.log(userList);
-    console.log(companyList);
+    //console.log(userList);
+    //console.log(companyList);
 }
 
 function addCompany(num){
-    var probability_soundness = Math.ceil(Math.random() * 100);
-    var probability_vision = Math.ceil(Math.random() * 100);
-    var probability_tendency = Math.ceil(Math.random() * 100);
-    var probability_variablilty = Math.ceil(Math.random() * 100);
+    var soundness = Math.ceil(Math.random() * 100);
+    var vision = Math.ceil(Math.random() * 100);
+    var tendency = Math.ceil(Math.random() * 100);
+    var variablilty = Math.ceil(Math.random() * 100);
     var max_price = 10000;
     var min_price = 100;
     var price_chiper = 3;
 
     for(var i = 0; i < num; i++){
         companyList.push(new company(numToAlphabet(company.prototype.num++),
-                        probability_soundness, 
-                        probability_vision, 
-                        probability_tendency, 
-                        probability_variablilty, 
+                        soundness, vision, tendency, variablilty, 
                         cateList[Math.floor(Math.random() * cateList.length)],
                         Math.floor(Math.random() * ((max_price - min_price) / Math.pow(10,price_chiper - 1) + 1)) * Math.pow(10 ,price_chiper - 1) + min_price
                         ));
@@ -267,6 +291,54 @@ function numToAlphabet(num){
         return String.fromCharCode(65  + Math.floor(num / 26) - 1) + String.fromCharCode(65 + (num % 26));
     }else{
         return num;
+    }
+}
+
+function addEncounters(num, turn){
+    var probabilityList = [3, 3, 3, 1];
+    //cate, specific, tendency, kospi
+
+    var probability_sum = 0;
+    var remain;
+    var category;
+    var target;
+    var detail; //0: 하락, 1: 상승
+
+    for(var i = 0; i < probabilityList.length; i++){
+        probability_sum += probabilityList[i]
+    }
+
+    for(var i = 0; i < num; i++){
+        remain = probability_sum;
+        category = probabilityList.length - 1;
+
+        for(var j = 0; j < probabilityList.length; j++){
+            if(Math.random() < probabilityList[j] / remain){
+                category = j;
+                break;
+            }
+            remain -= probabilityList[j];
+        }
+
+        switch(category){
+            case 0: // cate
+                target = Math.floor(Math.random() * (cateList.length));
+                detail = Math.floor(Math.random() * 2);
+                break;
+            case 1: // specific
+                target = Math.floor(Math.random() * (companyList.length));
+                detail = Math.floor(Math.random() * 2);
+                break;        
+            case 2: // tendency
+                target = Math.floor(Math.random() * (companyList.length));
+                detail = Math.floor(Math.random() * 100) + 1;
+                break;
+            case 3: // kospi
+                target = 1;
+                detail = Math.floor(Math.random() * 2);
+                break;
+        }
+        encounterList.push(new encounter(category, target, detail, Math.floor(Math.random() * 5)));
     }
 }
 

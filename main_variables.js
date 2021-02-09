@@ -1,9 +1,15 @@
 var companyList = [];   //save list of companies
-var eventList = [];     //save events 
+var encounterList = [];     //save encounters 
 var have = [];          //save my stocks
 var userList = [];      //save user Index in server
 var myIndex;            //save my Index in server
 var loading = false;
+var turn = 4;
+
+var loading_companyList = false;
+var loading_encounterList = false;
+var loading_cateList = false;
+var event_loading       //for loading event;
 
 function stock(){
     this.name;
