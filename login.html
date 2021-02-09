@@ -3,38 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <style type="text/css">
-        body{
-            margin:40px;
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR&display=swap');
+        .login{
+            width: 300px;
+            height: auto;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            text-align: center;
+            padding: 10px 10px 20px 10px;
+            margin-left: -150px;
+            margin-top: -150px;
+            border: 4px solid orange;
+            border-radius: 15px;
         }
-        
+        .login input[type="text"]{
+            width: 80%;
+            height: auto;
+            line-height: normal;
+            padding: .8em .5em;
+            border: 1px solid black;
+            border-radius: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 18px;
+            outline-style: none;
+            -webkit-appearance: none;
+            -moz-appearance: none; 
+            appearance: none;
+        }
+        .login input[type="button"]{
+            height: auto;
+            line-height: normal;
+            padding: .5em .5em;
+            border: 2px solid gray;
+            border-radius: 5px;
+            font-family: 'Do Hyeon', sans-serif;
+            font-size: 15px;
+            color: white;
+            background-color: orange;
+
+        }
     </style>
 </head>
 <body>
-    <p>
-        <label for="name"></label><input type="text" id="input_name">
-    </p>
-    <input type="button" id="btn_login" value="로그인">
-    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript">
-        var socket = io();
+    <div class="login">
+        <p>
+            <label for="name"></label>
+            <input type="text" id="input_name" placeholder="아이디">
+        </p>
+        <input type="button" id="btn_login" value="☆입장☆">
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            var socket = io();
 
-        socket.on('skipLogin', function(){
-            location.replace(document.URL + '/next');
-        });
+            socket.on('skipLogin', function(){
+                location.replace(document.URL + '/next');
+            });
 
-        socket.on('loginSuccess', function(){
-            location.replace(document.URL + '/next');
-        });
-        
-        var btn_login = document.getElementById("btn_login");
-        btn_login.onclick = function(){
-            var tempName = document.getElementById("input_name").value;
-            if(tempName == ""){
-                alert("이름을 입력하세요");
-            }else{
-                socket.emit('login', document.getElementById("input_name").value);
-            }
-        };
-    </script>
+            socket.on('loginSuccess', function(){
+                location.replace(document.URL + '/next');
+            });
+            
+            var btn_login = document.getElementById("btn_login");
+            btn_login.onclick = function(){
+                var tempName = document.getElementById("input_name").value;
+                if(tempName == ""){
+                    alert("이름을 입력하세요");
+                }else{
+                    socket.emit('login', document.getElementById("input_name").value);
+                }
+            };
+        </script>
+    </div>
 </body>
 </html>
