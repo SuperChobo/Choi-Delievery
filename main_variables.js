@@ -14,7 +14,9 @@ var loading_cateList = false;
 var event_loading       //for loading event;
 
 var btnSubmit = document.getElementById("btnSubmit");
-var formSubmit = document.getElementById("textArea")
+var textArea = document.getElementById("textArea")
+
+var nowTab = tabevent;
 
 function stock(){
     this.name;

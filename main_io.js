@@ -134,3 +134,22 @@ function o_haveInfo(){
 function o_estimateAsset(){
 
 }
+
+function inputFlow(){
+    if(textArea == ""){
+
+    }
+    else{
+        
+    }
+}
+
+btnSubmit.onclick = function(){
+    inputFlow();
+}
+
+textArea.onkeydown = function(e){
+    if(e.keyCode == 13){ //key ENTER
+        inputFlow();
+    }
+}
