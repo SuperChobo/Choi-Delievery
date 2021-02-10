@@ -6,17 +6,25 @@
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Poor+Story&display=swap');
-        .lobby{
+        .main{
             position: absolute;
-            width: 250px;
-            min-height: 400px;
+            width: 600px;
             height: auto;
-            left: 50%;
-            top: 40%;
+            left: 30%;
+            top: 30%;
+            padding: 3px;
             margin-left: -150px;
             margin-top: -150px;
-            padding: 10px;
             text-align: center;
+            display:table;
+        }
+        .lobby{
+            width: 210px;
+            min-height: 400px;
+            height: auto;
+            margin: 0;
+            padding: 3px;
+            display: table-cell;
         }
         .lobby .menu{
             display: flex;
@@ -31,7 +39,7 @@
             flex: 1;
             box-sizing: border-box;
             font-family: 'Do Hyeon', sans-serif;
-            font-size: 30px;
+            font-size: 25px;
             box-shadow: 7px 7px 5px -5px darkgoldenrod;
         }
         .lobby .start{
@@ -49,6 +57,7 @@
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 15px;
             box-shadow: 3px 3px 8px -3px darkgray;
+            cursor: pointer;
         }
         .lobby .list{
             width: 100%;
@@ -60,22 +69,182 @@
             font-size: 18px;
             box-shadow: 7px 7px 5px -5px darkgoldenrod inset;
         }
+        .jobs{
+            position: absolute;
+            min-width: 350px;
+            min-height: 400px;
+            margin-left: 10px;
+            text-align: center;
+            display: flex;
+        }
+        .jobs .wrapper{
+            width: 120px;
+            min-height: 400px;
+            flex: 1;
+        }
+        .jobs .choice{
+            width: 120px;
+            height: 100px;
+            border-top-left-radius: 15px;
+            background-color: lightskyblue;
+            margin-bottom: 3px;
+            box-shadow: 7px 7px 5px -5px steelblue inset;
+        }
+        .choice select{
+            margin:25px 0 5px 0; 
+        }
+        .choice input[type="submit"], [type="reset"]{
+            padding: 0 5px;
+            border: 2px solid turquoise;
+            border-radius: 5px;
+            background-color: paleturquoise;
+            margin: 5px 2px 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 15px;
+            box-shadow: 3px 3px 8px -3px darkgray;
+            cursor: pointer;
+        }
+        .jobs .jlist{
+            width: 120px;
+            height: 294px;
+            border-bottom-left-radius: 15px;
+            background-color: lightskyblue;
+            margin-top: 6px;
+            text-align: center;
+        }
+        ul.jtab{
+            list-style-type: none;
+            padding-left: 15px;
+            padding-top: 4px;
+            margin: 0;
+            display: flex;
+            align-content: flex-start;
+            flex-direction: column;
+            flex-wrap: wrap;
+            overflow: auto;
+            box-shadow: 7px 5px 5px -5px steelblue inset;
+        }
+        ul.jtab li{
+            cursor: pointer;
+            margin: 2px;
+            border-radius: 10px;
+            background-color: whitesmoke;
+            padding: 0 4px;
+            box-shadow: 7px 7px 5px -5px steelblue;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        ul.jtab li.current{
+            background-color: dodgerblue;
+            color: white;
+        }
+        .jobs .explan{
+            width: 230px;
+            height: inherit;
+            padding: 10px;
+            margin-left:6px;
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+            background-color: lightskyblue;
+            flex: 2;
+            display: none;
+            box-shadow: 7px 7px 5px -5px steelblue inset;
+        }
+        .jobs .explan.current{
+            display: inherit;
+        }
+        h1{
+            margin: 20px 0;
+            font-family: 'Do Hyeon', sans-serif;
+        }
     </style>
 </head>
 <body>
-    <div class="lobby">
-        <div class="menu">
-            <div class="name">
-                접속자
+    <div class="main">
+
+        <div class="lobby">
+            <div class="menu">
+                <div class="name">
+                    접속자
+                </div>
+                <div class="start">
+                    <input type = "button" id = "startBtn" value = "시작하기">
+                    <input type = "button" id = "backBtn" value = "뒤로">
+                </div>
             </div>
-            <div class="start">
-                <input type = "button" id = "startBtn" value = "시작하기">
-                <input type = "button" id = "backBtn" value = "뒤로">
-            </div>
+            <div class="list">
+                <p id=userList></p>
+            </div>   
         </div>
-        <div class="list">
-            <p id=userList></p>
-        </div>   
+
+        <div class="jobs">
+            <div class="wrapper">
+                <div class="choice">
+                    <form>
+                        <select name="jobli">
+                            <option label="직업선택" selected></option>
+                            <option value="j0b01" label="임우섭"></option>
+                            <option value="j0b02" label="손태현"></option>
+                            <option value="j0b03" label="금수저"></option>
+                            <option value="j0b04" label="파파라치"></option>
+                            <option value="j0b05" label="국세청직원"></option>
+                            <option value="j0b06" label="주갤러"></option>
+                            <option value="j0b07" label="스파이"></option>
+                            <option value="j0b08" label="공무원"></option>
+                            <option value="j0b09" label="해커"></option>
+                            <option value="j0b10" label="기자"></option>
+                        </select>
+                        <input type="submit" value="선택">
+                        <input type="reset" value="다시">
+                    </form>
+                </div>
+                <div class="jlist">
+                    <ul class="jtab">
+                        <li class="tab-link current" data-tab="j0b01">임우섭</li>
+                        <li class="tab-link" data-tab="j0b02">손태현</li>
+                        <li class="tab-link" data-tab="j0b03">금수저</li>
+                        <li class="tab-link" data-tab="j0b04">파파라치</li>
+                        <li class="tab-link" data-tab="j0b05">국세청직원</li>
+                        <li class="tab-link" data-tab="j0b06">주갤러</li>
+                        <li class="tab-link" data-tab="j0b07">스파이</li>
+                        <li class="tab-link" data-tab="j0b08">공무원</li>
+                        <li class="tab-link" data-tab="j0b09">해커</li>
+                        <li class="tab-link" data-tab="j0b10">기자</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="explan current" id="j0b01">
+                <h1>임우섭</h1>
+            </div>
+            <div class="explan" id="j0b02">
+                <h1>손태현</h1>
+            </div>
+            <div class="explan" id="j0b03">
+                <h1>금수저</h1>
+            </div>
+            <div class="explan" id="j0b04">
+                <h1>파파라치</h1>
+            </div>
+            <div class="explan" id="j0b05">
+                <h1>국세청직원</h1>
+            </div>
+            <div class="explan" id="j0b06">
+                <h1>주갤러</h1>
+            </div>
+            <div class="explan" id="j0b07">
+                <h1>스파이</h1>
+            </div>
+            <div class="explan" id="j0b08">
+                <h1>공무원</h1>
+            </div>
+            <div class="explan" id="j0b09">
+                <h1>해커</h1>
+            </div>            
+            <div class="explan" id="j0b10">
+                <h1>기자</h1>
+            </div>
+
+        </div>
+
     </div>
 
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
@@ -95,6 +264,23 @@
             document.getElementById('userList').innerHTML = msg
             console.log("refreshed")
         });
+    </script>
+
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+
+            $('ul.jtab li').click(function(){
+            var tab_id = $(this).attr('data-tab');
+
+            $('ul.jtab li').removeClass('current');
+            $('.explan').removeClass('current');
+
+            $(this).addClass('current');
+            $("#"+tab_id).addClass('current');
+            nowTab = tab_id;
+            })
+        })
     </script>
 </body>
 </html>
