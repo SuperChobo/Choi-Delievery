@@ -21,57 +21,85 @@
             text-align: center;
             font-family: 'Black Han Sans', sans-serif;
             font-size: 30pt;
+            background-color: #CFF09E;
         }
         .menu{
             height: auto;
-            border: 3px double blue;
-            background-color: darkblue;
-            display: table;
-        }
-        .menu_inner {
+            padding: 0;
+            background-color:#A8DBA8;
             text-align: center;
-            display: table-cell;
+            vertical-align: middle;
+        }
+        .menu .status {
+            width: 150px;
+            height: auto;
+            margin: 2px 5px;
+            padding: 3px;
+            border: 2px solid #263959;
+            background-color: #D7FFF1;
+            float: left;
+            text-align: left;
+        }
+        .menu .log {
+            width: 50px;
+            height: 50px;
+            margin: 0 5px;
+            border: 2px solid #55967e;
+            background-color: #D7FFF1;
+            border-radius: 25px;
+            float: left;
+            cursor: pointer;
+        }
+        .menu .turn{
+            width: 110px;
+            height: auto;
+            margin: 0 5px;
+            padding: 3px;
+            border: 2px solid #e4e7ec;
+            background-color: #D7FFF1;
+            float: left;
         }
         .menu .button{
-            text-align: center;
-            border: 2px solid black;
-            background-color: lightblue;
-            padding: 2px 5px; 
+            width: 80px;
+            height: auto;
             margin: 0 5px;
-            display: inline-block;
+            padding: 13px 0;
+            border: 2px solid #6d819c;
+            background-color: #D7FFF1; 
+            float: left;
+            cursor: pointer;
         }
         .wrapper{
             height: 50vh;
             min-height: 200px;
             max-height: 450px;
-            border: 1px solid darkgreen;
-            background-color: darkgreen;
+            background-color: #79BD9A;
             padding: 5px;
         }
         .wrapper .section{
             width: 70%;
-            min-width: 415px;
+            min-width: 423px;
             height: inherit;
             min-height: 98%;
             max-height: 98%;
-            border: 3px double lightgreen;
             border-radius: 15px;
-            background-color: white;
+            background-color: #79BD9A;
             float: left;
         }
         .wrapper .aside{
-            width: 25%;
+            width: 28%;
             height: inherit;
             min-height: 98%;
             max-height: 98%;
-            border: 3px double lime;
-            background-color: white;
-            float: right;
+            background-color: #67D5B5;
+            float: left;
+            margin-left: 10px;
+            border-top-right-radius: 15px;
+            border-bottom-left-radius: 15px;
         }
         .footer{
             height: auto;
-            border: 3px solid darkred;
-            background-color: lightpink;
+            background-color: #3B8686;
         }
         ul.tabs{
             margin: 0px;
@@ -79,24 +107,28 @@
             list-style: none;
         }
         ul.tabs li{
-            background: none;
-            color: #222;
+            background: #36C49B;
+            color: white;
             display: inline-block;
             padding: 10px 15px;
             cursor: pointer;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
         }
         ul.tabs li.current{
-            background: lightgray;
-            color: #222;
+            background: #67D5B5;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
         }
         .tab-content{
             display: none;
-            background: lightgray;
             padding: 10px 5px;
             height: 90%;
         }
         .tab-content.current{
             display: inherit;
+            background-color: #67D5B5;
         }
     </style>
 </head>
@@ -106,22 +138,26 @@
         <div class="header" id="autowidth">슈퍼개미 최배달</div>
     </div>
     <div class="menu" id="autowidth">
-        <div class="menu_inner">
-            <div class="button">
-                메뉴1
-            </div>
-            <div class="button">
-                메뉴2
-            </div>
-            <div class="button">
-                메뉴3
-            </div>
-            <div class="button">
-                메뉴4
-            </div>
-            <div class="button">
-                메뉴5
-            </div>
+        <div class="status">
+            &nbsp;이&nbsp;름&nbsp;:
+            <br>
+            행동력:
+        </div>
+        <div class="status">
+            추정자산:
+            <br>
+            보유현금:
+        </div>
+        <div class="log" onclick="window.open('/*http:링크탈주소, 새창열기*/')">
+
+        </div>
+        <div class="turn">
+            현재 턴
+            <br>
+            n&nbsp;/&nbsp;m
+        </div>
+        <div class="button">
+            턴 종료<!--관련 스크립트는 잘 모르겠어서 ㅎ;-->
         </div>
     </div>
     <div class="wrapper" id="autowidth">
@@ -155,7 +191,7 @@
     </div>
     <div class="footer" id="autowidth">
         <form>
-            <textarea id="textArea" rows="3" cols="50" placeholder="메모작성구간" required="required"></textarea>
+            <textarea id="textArea" rows="3" cols="55" placeholder="메모작성구간" required="required"></textarea>
             <br>
             <input type="button" id="btnSubmit" value="전송">
             <input type="reset" value="지우기">
