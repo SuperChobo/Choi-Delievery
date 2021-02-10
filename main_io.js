@@ -2,7 +2,7 @@ function o_companyList(){
     var output = [];
     var temp;
 
-    output.push("<회사번호를 입력하시오><br>");
+    output.push("<회사번호를 입력하시오>");
     for(var i = 0; i < companyList.length; i++){
         temp = (i + 1) + ". " + companyList[i].name + " [" + companyList[i].category + "]&emsp;&emsp;&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[i].price, companyList[i].prevPrice);
         output.push(temp);
