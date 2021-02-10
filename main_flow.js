@@ -9,7 +9,8 @@ nextTurn();
 function mainFlow(){
     window.clearInterval(event_loading);
 
-    turnCount++;
+    actionList = [];
+    tabDepth = [1, 1, 1, 1, 1];
     onGoing = true;
     fillData();
 }
@@ -26,10 +27,12 @@ function loadData(){
     loading_companyList = true;
     loading_encounterList = true;
     loading_cateList = true;
+    loading_info = true;
 
     socket.emit('reqCompanyList');
     socket.emit('reqEncounterList');
     socket.emit('reqCateList');
+    socket.emit('reqInfo');
 }
 
 function waitForLoading(){
@@ -39,7 +42,7 @@ function waitForLoading(){
 }
 
 function isLoading(){
-    if(loading_companyList || loading_encounterList || loading_cateList)
+    if(loading_companyList || loading_encounterList || loading_cateList || loading_info)
         return true;
     return false;
     

@@ -1,19 +1,25 @@
 socket.on('resCompanyList', function(data){
     companyList = data;
     loading_companyList = false;
-    console.log("companyList : ",companyList);
 })
 
 socket.on('resEncounterList', function(data){
     encounterList = data;
     loading_encounterList = false;
-    console.log("encounterList : ", encounterList);
 })
 
 socket.on('resCateList', function(data){
     cateList = data;
     loading_cateList = false;
-    console.log("CateList : ", cateList);
+})
+
+socket.on('resInfo', function(data_money, data_have, data_maxHP, data_turnCount){
+    money = data_money;
+    have = data_have;
+    hp = data_maxHP;
+    maxHP = data_maxHP;
+    turnCount = data_turnCount;
+    loading_info = false;
 })
 
 socket.on('nextTurn', function(){
@@ -21,5 +27,5 @@ socket.on('nextTurn', function(){
 })
 
 function ready(){
-    socket.emit('ready');
+    socket.emit('ready', actionList);
 }

@@ -15,6 +15,7 @@ var companyList = [];
 var encounterList = [];
 var isGameStart = false;
 var turnCount;
+var maxHP = 5;
 
 function action(category, target, detail){
     this.category = category;
@@ -26,7 +27,7 @@ function UserInfo(socket){
     this.socket = socket;
     this.name = "";
     this.character = "";
-    this.have = "";
+    this.have = [];
     this.money = "";
     this.connection = true;
 
@@ -248,7 +249,17 @@ io.on('connection', function(socket) {
         socket.emit('resCateList', cateList);
     })
 
-    socket.on('ready', function(){
+    socket.on('reqInfo', function(){
+        for(var i = 0; i < userList.length; i++){
+            if(userList[i].socket.handshake.address == socket.handshake.address){
+                socket.emit('resInfo', userList[i].money, userList[i].have, maxHP, turnCount)
+                break;
+            }else{
+            }
+        }
+    })
+
+    socket.on('ready', function(actionList){
         tadd = socket.handshake.address;
         var isValid = false;
         var allReady = true;
@@ -257,7 +268,8 @@ io.on('connection', function(socket) {
         for(i = 0; i < userList.length; i++){
             if(tadd == userList[i].socket.handshake.address){
                 isValid = true;
-                userList[i].isReady = true;  
+                userList[i].isReady = true;
+                userList[i].actionList = actionList;
                 console.log("결정 완료 : " + userList[i].socket.handshake.address);
             }
             if(!userList[i].isReady && userList[i].isPlaying){
@@ -308,13 +320,15 @@ function gameInit(){
 
     io.emit('startGame');
 
-    addCompany(30); // Num of Company
+    addCompany(12); // Num of Company
     addEncounters(500, 1); //num of Encounter, turn
     setMoney(-1, 100000);  // if -1 all or personal, amount of money
 
     for(var i = 0; i < userList.length; i++){
-        userList[i].isReady = false;
-        userList[i].isPlaying = true;
+        if(!userList[i].name == ""){
+            userList[i].isReady = false;
+            userList[i].isPlaying = true;
+        }
     }
 
     //console.log(userList);
@@ -322,15 +336,20 @@ function gameInit(){
 }
 
 function addCompany(num){
-    var soundness = Math.ceil(Math.random() * 100);
-    var vision = Math.ceil(Math.random() * 100);
-    var tendency = Math.ceil(Math.random() * 100);
-    var variability = Math.ceil(Math.random() * 100);
-    var max_price = 10000;
-    var min_price = 100;
+    var soundness
+    var vision
+    var tendency
+    var variability
+    var max_price = 5000;
+    var min_price = 5000;
     var price_chiper = 3;
 
     for(var i = 0; i < num; i++){
+        soundness = Math.ceil(Math.random() * 100);
+        vision = Math.ceil(Math.random() * 100);
+        tendency = Math.ceil(Math.random() * 100);
+        variability = Math.ceil(Math.random() * 100);
+
         companyList.push(new company(numToAlphabet(company.prototype.num++),
                         soundness, vision, tendency, variability, 
                         cateList[Math.floor(Math.random() * cateList.length)],
@@ -423,16 +442,54 @@ function nextTurn(){
 }
 
 function playerAction(){
-
+    var tempAction;
+    var k;
+    var isValid;
+    for(var i = 0; i < userList.length; i++){
+        for(var j = 0; j < userList[i].actionList.length; j++){
+            tempAction = userList[i].actionList[j];
+            switch(Number(tempAction.category)){
+                case 1: //buy
+                case 2: //sell
+                    isValid = false;
+                    for(k = 0; k < userList[i].have.length; k++){
+                        if(userList[i].have[k].name == companyList[tempAction.target].name){
+                            isValid = true;
+                            break;
+                        }
+                    }
+                    if(!isValid){
+                        userList[i].have.push({"name": companyList[tempAction.target].name, 
+                                                "num": 0, 
+                                                "totalPrice": 0
+                                                })
+                    }
+                    if(tempAction.category == 1){
+                        userList[i].have[k].num += Number(tempAction.detail);
+                        userList[i].have[k].totalPrice += tempAction.detail * companyList[tempAction.target].prevPrice;
+                        userList[i].money -= tempAction.detail * companyList[tempAction.target].prevPrice;
+                    }else{
+                        userList[i].have[k].num -= tempAction.detail;
+                        userList[i].have[k].totalPrice -= tempAction.detail * companyList[tempAction.target].prevPrice;
+                        if(userList[i].have[k].num == 0){
+                            userList[i].have.splice(k, 1);
+                        }
+                        userList[i].money += tempAction.detail * companyList[tempAction.target].prevPrice;
+                    }
+                    break;
+                default:
+            }
+        }
+    }
 }
 
 function eventAction(){
-
+    
 }
 
 function changeStockPrice(){
     for(var i = 0; i < companyList.length; i++){
         companyList[i].prevPrice = companyList[i].price;
-        companyList[i].price = Math.floor(companyList[i].prevPrice * (1 + companyList[i].tendency / 500 - companyList[i].variability / 250 * Math.random()))
+        companyList[i].price = Math.floor(companyList[i].prevPrice * (1 + ((companyList[i].tendency - 30) / 1500 + ((0.5 - Math.random()) / 500 * companyList[i].variability))));
     }
 }

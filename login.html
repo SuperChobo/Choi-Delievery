@@ -66,14 +66,26 @@
             });
             
             var btn_login = document.getElementById("btn_login");
+
             btn_login.onclick = function(){
+                getLogin();
+            };
+
+            window.onkeydown = function(e){
+                if(e.keycode == 13){
+                    getLogin();
+                }
+            }
+
+            function getLogin(){
                 var tempName = document.getElementById("input_name").value;
                 if(tempName == ""){
                     alert("이름을 입력하세요");
                 }else{
                     socket.emit('login', document.getElementById("input_name").value);
                 }
-            };
+            }
+
         </script>
     </div>
 </body>

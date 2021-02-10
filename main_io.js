@@ -4,7 +4,7 @@ function o_companyList(){
 
     output.push("<회사번호를 입력하시오><br>");
     for(var i = 0; i < companyList.length; i++){
-        temp = (i + 1) + ". " + companyList[i].name + "&emsp;&emsp;&emsp;&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[i].price, companyList[i].prevPrice);
+        temp = (i + 1) + ". " + companyList[i].name + "&emsp;&emsp;&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[i].price, companyList[i].prevPrice);
         output.push(temp);
     }
 
@@ -14,7 +14,7 @@ function o_companyList(){
 function o_companyInfo(index){
     var output = [];
 
-    output.push((index + 1) + ". " + companyList[index].name + " [ " + companyList[index].category + " ] "+ "&emsp;&emsp;&emsp;&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[index].price, companyList[index].prevPrice));
+    output.push((index + 1) + ". " + companyList[index].name + " [ " + companyList[index].category + " ] "+ "&emsp;&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[index].price, companyList[index].prevPrice) + "&emsp;" + printHaveAmouont(index));
     output.push("<br>");
     output.push("- 건전성 : " + companyList[index].soundness);
     output.push("- 미래지향성 : " + companyList[index].vision);
@@ -42,7 +42,19 @@ function printPriceChange(price, prevPrice){
         change = "↓ ";
     }
 
-    return temp + "<sub>" + change + Math.abs(price - prevPrice) + "</sub>";
+    return temp + "<sub>" + change + (Math.abs(price - prevPrice) / prevPrice * 100).toFixed(2) + "% (" + Math.abs(price - prevPrice) + ")</sub>";
+}
+
+function printHaveAmouont(index){
+    var i
+    var isValid = false;
+    for(i = 0; i < have.length; i++){
+        if(companyList[index].name == have[i].name){
+            investIndex[1] = i;
+            return "평단가 : " + Math.floor(have[i].totalPrice / have[i].num) + "<sub>보유 수 : " + have[i].num + "</sub>";
+        }
+    }
+    return "보유 수 : 0";
 }
 
 function o_investion(){
@@ -136,20 +148,155 @@ function o_estimateAsset(){
 }
 
 function inputFlow(){
-    if(textArea == ""){
-
+    if(textArea.value == ""){
     }
     else{
-        
+        switch(nowTab){
+            case "tabtwoza":
+                i_investion();
+                break;
+            case "tabjak":
+                i_operation();
+                break;
+            case "tabnodon":
+                i_work();
+                break;
+            case "tabjagi":
+                i_development();
+                break;
+        }
+    }
+    textArea.value = "";
+}
+
+function i_investion(){
+    var output = [];
+    if(Number.isNaN(textArea.value)) return;
+    switch(tabDepth[1]){
+        case 1: //주가정보
+            if(textArea.value > 0 && textArea.value <= companyList.length){
+                document.getElementById("tabtwoza").innerHTML = o_companyInfo(textArea.value - 1);
+                tabDepth[1]++;
+                investIndex[0] = textArea.value - 1
+            }
+            break;
+        case 2: //세부 회사 정보
+            switch(textArea.value){
+                case '1': //구매하기
+                    if(hp != maxHP && !isTurnInvest){
+                        alert("행동력이 부족합니다.");
+                        break;
+                    }
+
+                    output.push("<구매할 수량을 입력하여 주십시오. (0을 입력시 처음으로)>");
+                    output.push("<br>");
+                    output.push((investIndex[0] + 1) + ". " + companyList[investIndex[0]].name + " [ " + companyList[investIndex[0]].category + " ] ");
+                    output.push("<br>");
+                    output.push("주가 : " + printPriceChange(companyList[investIndex[0]].price, companyList[investIndex[0]].prevPrice));
+                    output.push(printHaveAmouont(investIndex[0]));
+                    output.push("<br>");
+                    output.push("구매가능 수량 : " + Math.floor(money / companyList[investIndex[0]].price));               
+
+                    document.getElementById("tabtwoza").innerHTML = output.join("<br>");
+                    tabDepth[1]++;
+                    investIndex[2] = 1;
+                    break;
+                case '2': //판매하기
+                    if(hp != maxHP && !isTurnInvest){
+                        alert("행동력이 부족합니다.");
+                        break;
+                    }
+                    output.push("<판매할 수량을 입력하여 주십시오. (0을 입력시 처음으로)>");
+                    output.push("<br>");
+                    output.push((investIndex[0] + 1) + ". " + companyList[investIndex[0]].name + " [ " + companyList[investIndex[0]].category + " ] ");
+                    output.push("<br>");
+                    output.push("주가 : " + printPriceChange(companyList[investIndex[0]].price, companyList[investIndex[0]].prevPrice));
+                    output.push(printHaveAmouont(investIndex[0]));
+                    output.push("<br>");            
+
+                    document.getElementById("tabtwoza").innerHTML = output.join("<br>");
+                    tabDepth[1]++;
+                    investIndex[2] = 2;
+                    break;
+                case '0': //돌아가기
+                    document.getElementById("tabtwoza").innerHTML = o_companyList();
+                    tabDepth[1] = 1;
+                    break;
+            }
+            break;
+        case 3: //구매, 판매
+            if(textArea.value == '0'){
+                document.getElementById("tabtwoza").innerHTML = o_companyList();
+                tabDepth[1] = 1;
+                break;
+            }else{
+                switch(investIndex[2]){
+                    case 1: //구매
+                        if(textArea.value > Math.floor(money / companyList[investIndex[0]].price)){
+                            alert("구매 가능 수량을 초과하였습니다.");
+                            break;
+                        }else{
+                            money -= companyList[investIndex[0]].price * textArea.value;
+                            hp = 0;
+                            isTurnInvest = true;
+                            actionList.push(new action(1, investIndex[0], textArea.value));     
+                            alert("구매 예약 완료되었습니다.");
+                            document.getElementById("tabtwoza").innerHTML = o_companyList();
+                            tabDepth[1] = 1;
+                        }
+                        break;
+                    case 2: //판매
+                        if(textArea.value > have[investIndex[1]].num){
+                            alert("판매 가능 수량을 초과하였습니다.");
+                            break;
+                        }else{
+                            hp = 0;
+                            isTurnInvest = true;
+                            actionList.push(new action(2, investIndex[0], textArea.value));
+                            alert("판매 예약 완료되었습니다.");
+                            document.getElementById("tabtwoza").innerHTML = o_companyList();
+                            tabDepth[1] = 1;
+                        }
+                        break;
+                }
+            }
+            break;
     }
 }
 
+function i_operation(){
+
+}
+
+function i_work(){
+
+}
+
+function i_development(){
+
+}
+
 btnSubmit.onclick = function(){
-    inputFlow();
+    if(onGoing){
+        inputFlow();
+    }
 }
 
 textArea.onkeydown = function(e){
     if(e.keyCode == 13){ //key ENTER
-        inputFlow();
+        if(onGoing)
+            inputFlow();
+    }
+}
+
+textArea.onkeyup = function(e){
+    if(e.keyCode == 13){ //key ENTER
+        textArea.value = "";
+    }
+}
+
+window.onkeydown = function(e){
+    if(e.keyCode == 27){
+        ready();
     }
 }
