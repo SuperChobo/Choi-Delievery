@@ -13,6 +13,9 @@ var loading_encounterList = false;
 var loading_cateList = false;
 var event_loading       //for loading event;
 
+var btnSubmit = document.getElementById("btnSubmit");
+var formSubmit = document.getElementById("textArea")
+
 function stock(){
     this.name;
     this.num;           //num of stocks
