@@ -14,12 +14,22 @@ function mainFlow(){
     fillData();
 }
 
-function fillData(){
+fillData = function(){
     document.getElementById("tabtwoza").innerHTML = o_companyList();
     document.getElementById("tabevent").innerHTML = o_eventList();
     document.getElementById("tabjak").innerHTML = o_operation();
     document.getElementById("tabjagi").innerHTML = o_development();
     document.getElementById("tabnodon").innerHTML = o_work();
+
+    document.getElementById("infoName").innerHTML = "이름: " + userName;
+
+    fillRTData();
+}
+
+fillRTData = function(){
+    document.getElementById("infoAsset").innerHTML = "추정자산: " + o_estimateAsset() + "<br>" + "보유현금: " + money;
+    document.getElementById("infoTurn").innerHTML = "턴: " + turnCount + "<br>" + "행동력: " + hp + " / " + maxHP;
+    document.getElementById("infoSide").innerHTML = o_action();
 }
 
 function loadData(){

@@ -7,8 +7,12 @@ var turnCount = 4;      //now turn
 var onGoing = false;    //Is my turn ongoing
 var actionList = [];
 var money;
+var userName;
 
 var nextTurn            //function to next turn
+var fillData
+var fillRTData
+
 var isTurnInvest = false;    //can invest or not
 var hp = 0;
 var maxHP;

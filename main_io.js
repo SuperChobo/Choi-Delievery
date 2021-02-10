@@ -1,10 +1,20 @@
 function o_companyList(){
     var output = [];
     var temp;
+    var temp2;
 
     output.push("<회사번호를 입력하시오>");
     for(var i = 0; i < companyList.length; i++){
-        temp = (i + 1) + ". " + companyList[i].name + " [" + companyList[i].category + "]&emsp;&emsp;&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[i].price, companyList[i].prevPrice);
+        temp = (i + 1) + ". " + companyList[i].name + " [" + companyList[i].category + "]&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[i].price, companyList[i].prevPrice);
+        for(var j = 0; j < have.length; j++){
+            if(have[j].name == companyList[i].name){
+                temp2 = Math.floor(have[j].totalPrice / have[j].num);
+                if(have[j].num > 0)
+                    temp += "&emsp;평단가: " + printPriceChange(temp2, companyList[i].price) + " <sub>" + have[j].num + "주</sub>"; 
+                break;
+            }
+        }
+
         output.push(temp);
     }
 
@@ -32,17 +42,17 @@ function o_companyInfo(index){
 
 function printPriceChange(price, prevPrice){
     var change;
-    var temp = price + "&emsp;"
+    var temp = price + " "
 
     if(price > prevPrice){
-        change = "↑ ";
+        change = '<a style="color:rgb(230,100,100)">↑';
     }else if(price == prevPrice){
-        return temp + "<sub>" + "- " + "</sub>";
+        return temp + "<sub>" + "-" + "</sub>";
     }else{
-        change = "↓ ";
+        change = '<a style="color:rgb(100,100,230)">↓';
     }
 
-    return temp + "<sub>" + change + (Math.abs(price - prevPrice) / prevPrice * 100).toFixed(2) + "% (" + Math.abs(price - prevPrice) + ")</sub>";
+    return temp + "<sub>" + change + (Math.abs(price - prevPrice) / prevPrice * 100).toFixed(2) + "% (" + Math.abs(price - prevPrice) + ")</sub></a>";
 }
 
 function printHaveAmouont(index){
@@ -145,8 +155,37 @@ function o_haveInfo(){
 
 }
 
-function o_estimateAsset(){
+function o_action(){
+    var output = [];
+    output.push("&emsp;&emsp;&emsp;&emsp;[행동 리스트]")
+    var temp;
+    for(var i = 0; i < actionList.length; i++){
+        switch(actionList[i].category){
+            case 1:
+                output.push(companyList[actionList[i].target].name + " 주식 " + actionList[i].detail + " 주 구매.");
+                break;
+            case 2:
+                output.push(companyList[actionList[i].target].name + " 주식 " + actionList[i].detail + " 주 판매.");
+                break;
+            case 3:
+                output.push("노동");
+                break;
+        }
+    }
+    return output.join("<br>");
+}
 
+function o_estimateAsset(){
+    var temp = money;
+    for(var i = 0; i < have.length; i++){
+        for(var j = 0; j < companyList.length; j++){
+            if(companyList[j].name == have[i].name){
+                temp += companyList[j].price * have[i].num;
+                break;
+            }
+        }
+    }
+    return temp;
 }
 
 function inputFlow(){
@@ -168,6 +207,7 @@ function inputFlow(){
                 break;
         }
     }
+    fillRTData();
     textArea.value = "";
 }
 
@@ -185,6 +225,10 @@ function i_investion(){
         case 2: //세부 회사 정보
             switch(textArea.value){
                 case '1': //구매하기
+                    if(!onGoing){
+                        alert("턴이 종료되었습니다.");
+                        return;
+                    }
                     if(hp != maxHP && !isTurnInvest){
                         alert("행동력이 부족합니다.");
                         break;
@@ -204,6 +248,10 @@ function i_investion(){
                     investIndex[2] = 1;
                     break;
                 case '2': //판매하기
+                    if(!onGoing){
+                        alert("턴이 종료되었습니다.");
+                        return;
+                    }
                     if(hp != maxHP && !isTurnInvest){
                         alert("행동력이 부족합니다.");
                         break;
@@ -254,6 +302,12 @@ function i_investion(){
                         }else{
                             hp = 0;
                             isTurnInvest = true;
+                            for(var i = 0; i < have.length; i++){
+                                if(have[i].name == companyList[investIndex[0]].name){
+                                    have[i].num = have[i].num - Number(textArea.value);
+                                    break;
+                                }
+                            }
                             actionList.push(new action(2, investIndex[0], textArea.value));
                             alert("판매 예약 완료되었습니다.");
                             document.getElementById("tabtwoza").innerHTML = o_companyList();
@@ -271,7 +325,27 @@ function i_operation(){
 }
 
 function i_work(){
+    if(!onGoing){
+        alert("턴이 종료되었습니다.");
+        return;
+    }
+    if(isNaN(textArea.value)) return;
 
+
+
+    switch(Number(textArea.value)){
+        case 1:
+            var hp_cost = 5;
+            if(hp < hp_cost){
+                alert("체력이 부족합니다.");
+                return;
+            }
+
+            alert("노동을 선택하였습니다.");
+            actionList.push(new action(3, 0, 1));
+            hp -= hp_cost;
+            break;
+    }
 }
 
 function i_development(){
@@ -285,10 +359,11 @@ btnSubmit.onclick = function(){
 }
 
 textArea.onkeydown = function(e){
-    if(e.keyCode == 13){ //key ENTER
-        if(onGoing)
-            inputFlow();
-    }
+
+}
+
+document.getElementById("btnSkip").onclick = function(){
+    ready();
 }
 
 textArea.onkeyup = function(e){
@@ -298,7 +373,47 @@ textArea.onkeyup = function(e){
 }
 
 window.onkeydown = function(e){
-    if(e.keyCode == 27){
-        ready();
+
+}
+
+window.onkeydown = function(e){
+    if(document.getElementById("textArea") == document.activeElement){
+        switch(e.keyCode){
+        case 13: //key ENTER
+            if(onGoing)
+                inputFlow();
+            break;
+        case 27:
+            document.getElementById("textArea").blur();
+            break;
+        }   
+    }else{
+        switch(e.keyCode){
+        case 27:
+            ready();
+            break;
+        case 13:
+            document.getElementById("textArea").focus();
+            break;
+        case 49:case 50:case 51:case 52:case 53:
+        case 97:case 98:case 99:case 100:case 101:
+            var tempTab;
+            switch(e.keyCode){
+                case 49: case 97: tempTab = 'tabevent'; break;
+                case 50: case 98: tempTab = 'tabtwoza'; break;
+                case 51: case 99: tempTab = 'tabjak'; break;
+                case 52: case 100: tempTab = 'tabnodon'; break;
+                case 53: case 101: tempTab = 'tabjagi'; break;
+            }
+            $('ul.tabs li').removeClass('current');
+            $('.tab-content').removeClass('current');
+
+            $('#'+tempTab).addClass('current');
+            $('#'+tempTab+'1').addClass('current');
+            nowTab = tempTab
+            break;
+        default:
+        }
+
     }
 }

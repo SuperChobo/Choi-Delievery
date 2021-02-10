@@ -260,7 +260,7 @@ io.on('connection', function(socket) {
     socket.on('reqInfo', function(){
         for(var i = 0; i < userList.length; i++){
             if(userList[i].socket.handshake.address == socket.handshake.address){
-                socket.emit('resInfo', userList[i].money, userList[i].have, maxHP, turnCount)
+                socket.emit('resInfo', userList[i].money, userList[i].have, maxHP, turnCount, userList[i].name)
                 break;
             }else{
             }
@@ -561,6 +561,8 @@ function playerAction(){
                         userList[i].money += tempAction.detail * companyList[tempAction.target].prevPrice;
                     }
                     break;
+                case 3: //work
+                    userList[i].money += 2000;
                 default:
             }
         }

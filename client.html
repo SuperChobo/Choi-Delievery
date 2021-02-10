@@ -138,12 +138,10 @@
         <div class="header" id="autowidth">슈퍼개미 최배달</div>
     </div>
     <div class="menu" id="autowidth">
-        <div class="status">
+        <div id="infoName" class="status">
             &nbsp;이&nbsp;름&nbsp;:
-            <br>
-            행동력:
         </div>
-        <div class="status">
+        <div id="infoAsset" class="status">
             추정자산:
             <br>
             보유현금:
@@ -151,23 +149,23 @@
         <div class="log" onclick="window.open('/*http:링크탈주소, 새창열기*/')">
 
         </div>
-        <div class="turn">
-            현재 턴
+        <div id="infoTurn" class="turn">
+            턴:
             <br>
-            n&nbsp;/&nbsp;m
+            행동력:
         </div>
-        <div class="button">
+        <div id="btnSkip" class="button">
             턴 종료<!--관련 스크립트는 잘 모르겠어서 ㅎ;-->
         </div>
     </div>
     <div class="wrapper" id="autowidth">
         <div class="section">
             <ul class="tabs">
-                <li class="tab-link current" data-tab="tabevent">이벤트로그</li>
-                <li class="tab-link" data-tab="tabtwoza">투자</li>
-                <li class="tab-link" data-tab="tabjak">작전</li>
-                <li class="tab-link" data-tab="tabnodon">노동</li>
-                <li class="tab-link" data-tab="tabjagi">자기개발</li>
+                <li class="tab-link current" id="tabevent1" data-tab="tabevent">이벤트로그</li>
+                <li class="tab-link" id="tabtwoza1" data-tab="tabtwoza">투자</li>
+                <li class="tab-link" id="tabjak1" data-tab="tabjak">작전</li>
+                <li class="tab-link" id="tabnodon1" data-tab="tabnodon">노동</li>
+                <li class="tab-link" id="tabjagi1" data-tab="tabjagi">자기개발</li>
             </ul>
             <div id="tabevent" class="tab-content current">
                 
@@ -185,7 +183,7 @@
                 
             </div>
         </div>
-        <div class="aside">
+        <div id="infoSide" class="aside">
 
         </div>
     </div>
@@ -199,12 +197,6 @@
     </div>
 
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="/mainVariables"></script>
-    <script type="text/javascript" src="/mainIO"></script>
-    <script type="text/javascript" src="/mainCommunication"></script>
-    <script type="text/javascript" src="/mainFlow">
-    </script>
-
     <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script>
         $(document).ready(function(){
@@ -221,5 +213,9 @@
             })
         })
     </script>
+    <script type="text/javascript" src="/mainVariables"></script>
+    <script type="text/javascript" src="/mainIO"></script>
+    <script type="text/javascript" src="/mainCommunication"></script>
+    <script type="text/javascript" src="/mainFlow"></script>
 </body>
 </html>
