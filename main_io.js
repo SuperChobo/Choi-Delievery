@@ -19,7 +19,7 @@ function o_companyInfo(index){
     output.push("- 건전성 : " + companyList[index].soundness);
     output.push("- 미래지향성 : " + companyList[index].vision);
     output.push("- 신뢰성 : " + companyList[index].tendency);
-    output.push("- 변동성 : " + companyList[index].variablilty);
+    output.push("- 변동성 : " + companyList[index].variability);
 
     output.push("<br>");
     output.push("<원하는 행동을 선택하시오.>");
@@ -39,10 +39,10 @@ function printPriceChange(price, prevPrice){
     }else if(price == prevPrice){
         return temp + "<sub>" + "- " + "</sub>";
     }else{
-        chagne = "↓ ";
+        change = "↓ ";
     }
 
-    return temp + "<sub>" + change + (price - prevPrice) + "</sub>";
+    return temp + "<sub>" + change + Math.abs(price - prevPrice) + "</sub>";
 }
 
 function o_investion(){
@@ -103,9 +103,9 @@ function o_eventList(){
     var temp;
 
     for(var i = 0; i < encounterList.length; i++){
-        if(turn < encounterList[i].turn)            continue;
-        else if(turn - encounterList[i].turn == 0)  temp = "[방금] ";
-        else                                        temp = "[" + (turn - encounterList[i].turn) + "턴 전] "
+        if(turnCount < encounterList[i].turn)            continue;
+        else if(turnCount - encounterList[i].turn == 0)  temp = "[방금] ";
+        else                                        temp = "[" + (turnCount - encounterList[i].turn) + "턴 전] "
         switch(encounterList[i].category){
             //cate, specific, tendency, kospi
             case 0:

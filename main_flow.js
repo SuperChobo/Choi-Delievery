@@ -1,11 +1,17 @@
-loadInitData();
+nextTurn = function(){
+    onGoing = false;
+    loadData();
+    event_loading = window.setInterval(waitForLoading, 100);
+}
 
-event_loading = window.setInterval(waitForLoading, 100);
+nextTurn();
 
 function mainFlow(){
     window.clearInterval(event_loading);
-    fillData();
 
+    turnCount++;
+    onGoing = true;
+    fillData();
 }
 
 function fillData(){
@@ -16,7 +22,7 @@ function fillData(){
     document.getElementById("tabnodon").innerHTML = o_work();
 }
 
-function loadInitData(){
+function loadData(){
     loading_companyList = true;
     loading_encounterList = true;
     loading_cateList = true;

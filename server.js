@@ -3,6 +3,7 @@ var http = require('http');
 var app = express();
 var server = http.createServer(app);
 var io = require('socket.io')(server);
+
 server.listen(3000);
 
 //
@@ -13,6 +14,13 @@ var userList = [];
 var companyList = [];
 var encounterList = [];
 var isGameStart = false;
+var turnCount;
+
+function action(category, target, detail){
+    this.category = category;
+    this.target = target;
+    this.detail = detail;
+}
 
 function UserInfo(socket){
     this.socket = socket;
@@ -21,14 +29,19 @@ function UserInfo(socket){
     this.have = "";
     this.money = "";
     this.connection = true;
+
+    this.timeout;
+    this.isReady;
+    this.actionList = [];    //category, target, detail
+    this.isPlaying = false;
 }
 
-function company(name, soundness, vision, tendency, variablilty, category, price){
+function company(name, soundness, vision, tendency, variability, category, price){
     this.name = name;
     this.soundness = soundness;
     this.vision = vision;
     this.tendency = tendency;
-    this.variablilty = variablilty;
+    this.variability = variability;
     this.category = category;
 
     this.price = price;
@@ -69,17 +82,23 @@ app.get('/', function(req, res){
 });
 
 app.get('/login', function(req, res){
+    var i;
     var tadd = req.ip;
     var isValid = false;
     for(i = 0; i < userList.length; i++){
         if(tadd == userList[i].socket.handshake.address){
-            isValid = true;
-            break;
+            if(userList[i].name == ""){
+                isValid = false;
+                break;
+            }else{
+                isValid = true;
+                break;
+            }
         }
     }
-
     if(isValid){
         res.redirect("/lobby");
+        return;
     }
     res.sendFile(__dirname + '/login.html');
 });
@@ -89,19 +108,23 @@ app.get('/login/next', function(req, res){
 });
 
 app.get('/lobby', function(req, res){
+    var i;
     var tadd = req.ip;
     var isValid = false;
     for(i = 0; i < userList.length; i++){
         if(tadd == userList[i].socket.handshake.address){
-            isValid = true;
-            break;
+            if(userList[i].name == ""){
+                isValid = false;
+                break;
+            }else{
+                isValid = true;
+                break;
+            }
         }
     }
-
     if(!isValid){
         res.redirect("/login");
     }else{
-
         if(!isGameStart){
             res.sendFile(__dirname + '/lobby.html');
         }else{
@@ -155,6 +178,12 @@ io.on('connection', function(socket) {
     for(i = 0; i < userList.length; i++){
         if(tadd == userList[i].socket.handshake.address){
             isValid = true;
+            if(userList[i].timeout){
+                clearTimeout(userList[i].timeout);
+                userList[i].timeout = ""
+                console.log('재연결 성공 : ' + userList[i].socket.handshake.address)     
+            }
+
             if(userList[i].name != "")
                 socket.emit('skipLogin','');
             break;
@@ -164,14 +193,14 @@ io.on('connection', function(socket) {
     if(!isValid){
         console.log("클라이언트 접속 : " + tadd)
         userList.push(new UserInfo(socket));
-        console.log(userList);
     }
     userList[i].connection = true;
 
-    io.emit('refreshList', userList.length, strAddrList());
+    io.emit('refreshList', strAddrList());
 
     socket.on('disconnect', function(){
         tadd = socket.handshake.address;
+        var i;
         var isValid = false;
         for(i = 0; i < userList.length; i++){
             if(tadd == userList[i].socket.handshake.address){
@@ -181,13 +210,12 @@ io.on('connection', function(socket) {
         }
         if(isValid){
             userList[i].connection = false
-            setTimeout(checkDisconnect, 1000, userList[i].socket.handshake.address);
+            console.log("연결 끊김 : " + userList[i].socket.handshake.address);
+            userList[i].timeout = setTimeout(checkDisconnect, 1000, userList[i].socket.handshake.address);
         }
     });
 
     socket.on('btnGameStart', function(){
-        isGameStart = true;
-        io.emit('startGame');
         gameInit();
     });
 
@@ -219,6 +247,27 @@ io.on('connection', function(socket) {
     socket.on('reqCateList', function(){
         socket.emit('resCateList', cateList);
     })
+
+    socket.on('ready', function(){
+        tadd = socket.handshake.address;
+        var isValid = false;
+        var allReady = true;
+        var i = 0;
+
+        for(i = 0; i < userList.length; i++){
+            if(tadd == userList[i].socket.handshake.address){
+                isValid = true;
+                userList[i].isReady = true;  
+                console.log("결정 완료 : " + userList[i].socket.handshake.address);
+            }
+            if(!userList[i].isReady && userList[i].isPlaying){
+                allReady = false;
+            }
+        }
+        if(allReady){
+            nextTurn();
+        }
+    })
 });
 
 function checkDisconnect(addr){
@@ -232,14 +281,10 @@ function checkDisconnect(addr){
     if(!isValid){
         return;
     }
-    console.log('연결시간 체크 : ' + userList[i].socket.handshake.address)
-    if(userList[i].connection == false){
-        console.log('연결시간 초과 : ' + userList[i].socket.handshake.address);
-        userList.splice(i, 1);
-        io.emit('refreshList', userList.length, strAddrList());
-    }else{
-        console.log('재연결 성공 : ' + userList[i].socket.handshake.address)
-    }
+
+    console.log('연결시간 초과 : ' + userList[i].socket.handshake.address);
+    userList.splice(i, 1);
+    io.emit('refreshList', userList.length, strAddrList());
 }
 
 function strAddrList(){
@@ -258,9 +303,19 @@ function strAddrList(){
 //
 
 function gameInit(){
+    isGameStart = true;
+    turnCount = 1;
+
+    io.emit('startGame');
+
     addCompany(30); // Num of Company
-    addEncounters(500, 1);
-    setMoney(-1, 100000);
+    addEncounters(500, 1); //num of Encounter, turn
+    setMoney(-1, 100000);  // if -1 all or personal, amount of money
+
+    for(var i = 0; i < userList.length; i++){
+        userList[i].isReady = false;
+        userList[i].isPlaying = true;
+    }
 
     //console.log(userList);
     //console.log(companyList);
@@ -270,14 +325,14 @@ function addCompany(num){
     var soundness = Math.ceil(Math.random() * 100);
     var vision = Math.ceil(Math.random() * 100);
     var tendency = Math.ceil(Math.random() * 100);
-    var variablilty = Math.ceil(Math.random() * 100);
+    var variability = Math.ceil(Math.random() * 100);
     var max_price = 10000;
     var min_price = 100;
     var price_chiper = 3;
 
     for(var i = 0; i < num; i++){
         companyList.push(new company(numToAlphabet(company.prototype.num++),
-                        soundness, vision, tendency, variablilty, 
+                        soundness, vision, tendency, variability, 
                         cateList[Math.floor(Math.random() * cateList.length)],
                         Math.floor(Math.random() * ((max_price - min_price) / Math.pow(10,price_chiper - 1) + 1)) * Math.pow(10 ,price_chiper - 1) + min_price
                         ));
@@ -352,6 +407,32 @@ function setMoney(player, money){
     }
 }
 
+function nextTurn(){
+    console.log(turnCount + " 턴 종료");
+    changeStockPrice();
+    eventAction();
+    playerAction();
+    
+    for(var i = 0; i < userList.length; i++){
+        userList[i].isReady = false;
+    }
 
+    turnCount++;
+    console.log(turnCount + " 턴 시작");
+    io.emit('nextTurn');
+}
 
+function playerAction(){
 
+}
+
+function eventAction(){
+
+}
+
+function changeStockPrice(){
+    for(var i = 0; i < companyList.length; i++){
+        companyList[i].prevPrice = companyList[i].price;
+        companyList[i].price = Math.floor(companyList[i].prevPrice * (1 + companyList[i].tendency / 500 - companyList[i].variability / 250 * Math.random()))
+    }
+}

@@ -15,3 +15,11 @@ socket.on('resCateList', function(data){
     loading_cateList = false;
     console.log("CateList : ", cateList);
 })
+
+socket.on('nextTurn', function(){
+    nextTurn();
+})
+
+function ready(){
+    socket.emit('ready');
+}
