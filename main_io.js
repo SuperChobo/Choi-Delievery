@@ -4,7 +4,7 @@ function o_companyList(){
 
     output.push("<회사번호를 입력하시오><br>");
     for(var i = 0; i < companyList.length; i++){
-        temp = (i + 1) + ". " + companyList[i].name + "&emsp;&emsp;&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[i].price, companyList[i].prevPrice);
+        temp = (i + 1) + ". " + companyList[i].name + " [" + companyList[i].category + "]&emsp;&emsp;&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[i].price, companyList[i].prevPrice);
         output.push(temp);
     }
 
@@ -114,8 +114,10 @@ function o_eventList(){
     output.push("<이벤트 목록>");
     var temp;
 
+    if(encounterList == null)
+        return output;
     for(var i = 0; i < encounterList.length; i++){
-        if(turnCount < encounterList[i].turn)            continue;
+        if(turnCount < encounterList[i].turn)   temp = "[" + (encounterList[i].turn - turnCount) + "턴 후] ";
         else if(turnCount - encounterList[i].turn == 0)  temp = "[방금] ";
         else                                        temp = "[" + (turnCount - encounterList[i].turn) + "턴 전] "
         switch(encounterList[i].category){

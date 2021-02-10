@@ -8,7 +8,6 @@ nextTurn();
 
 function mainFlow(){
     window.clearInterval(event_loading);
-
     actionList = [];
     tabDepth = [1, 1, 1, 1, 1];
     onGoing = true;

@@ -1,9 +1,9 @@
 var express = require('express');
 var http = require('http');
+const { type } = require('os');
 var app = express();
 var server = http.createServer(app);
 var io = require('socket.io')(server);
-
 server.listen(3000);
 
 //
@@ -35,6 +35,7 @@ function UserInfo(socket){
     this.isReady;
     this.actionList = [];    //category, target, detail
     this.isPlaying = false;
+    this.encounterList = [];
 }
 
 function company(name, soundness, vision, tendency, variability, category, price){
@@ -56,9 +57,9 @@ function stock(){
 }
 
 function encounter(category, target, detail, turn){
-    this.category = category;
+    this.category = category;    //0.cate, specific, tendency, kospi
     this.target = target;
-    this.detail = detail;
+    this.detail = detail;   //0 하락 1 상승
     this.turn = turn;
 }
 
@@ -212,7 +213,7 @@ io.on('connection', function(socket) {
         if(isValid){
             userList[i].connection = false
             console.log("연결 끊김 : " + userList[i].socket.handshake.address);
-            userList[i].timeout = setTimeout(checkDisconnect, 1000, userList[i].socket.handshake.address);
+            userList[i].timeout = setTimeout(checkDisconnect, 5000, userList[i].socket.handshake.address);
         }
     });
 
@@ -243,7 +244,14 @@ io.on('connection', function(socket) {
         socket.emit('resCompanyList', companyList);
     })
     socket.on('reqEncounterList', function(){
-        socket.emit('resEncounterList', encounterList);
+        var sendEncounterList;
+        for(var i = 0; i < encounterList.length; i++){
+            if(encounterList[i].turn > turnCount){
+                sendEncounterList = encounterList.slice(0, i);
+                break;
+            }
+        }
+        socket.emit('resEncounterList', sendEncounterList);
     })
     socket.on('reqCateList', function(){
         socket.emit('resCateList', cateList);
@@ -321,8 +329,11 @@ function gameInit(){
     io.emit('startGame');
 
     addCompany(12); // Num of Company
-    addEncounters(500, 1); //num of Encounter, turn
     setMoney(-1, 100000);  // if -1 all or personal, amount of money
+    
+    for(var i = 0; i < 5; i++){
+        addEncounters(6, i + 2);
+    }
 
     for(var i = 0; i < userList.length; i++){
         if(!userList[i].name == ""){
@@ -330,9 +341,37 @@ function gameInit(){
             userList[i].isPlaying = true;
         }
     }
-
     //console.log(userList);
     //console.log(companyList);
+}
+
+function nextTurn(){
+    console.log(turnCount + " 턴 종료");
+
+    turnCount++;
+    for(var i = 0; i < encounterList.length; i++){
+        if(encounterList[i].turn >= turnCount){
+            encounterList.splice(0, i);
+            break;
+        }
+    }
+    for(var i = 0; i < companyList.length; i++){
+        companyList[i].prevPrice = companyList[i].price;
+    }
+
+    eventAction();
+    changeStockPrice();
+    playerAction();
+
+
+    addEncounters(6, turnCount + 5); //num of Encounter, turn
+    for(var i = 0; i < userList.length; i++){
+        userList[i].isReady = false;
+    }
+
+    console.log("--------------------------------------------------------");
+    console.log(turnCount + " 턴 시작");
+    io.emit('nextTurn');
 }
 
 function addCompany(num){
@@ -372,48 +411,108 @@ function addEncounters(num, turn){
     var probabilityList = [3, 3, 3, 1];
     //cate, specific, tendency, kospi
 
-    var probability_sum = 0;
-    var remain;
-    var category;
-    var target;
-    var detail; //0: 하락, 1: 상승
+    var type_num = [];
+    var sum = 0;
+    var abs_sum;
+    var type_probability = [];
+    var i, j, k;
 
-    for(var i = 0; i < probabilityList.length; i++){
-        probability_sum += probabilityList[i]
+    for(i = 0; i < probabilityList.length; i++){
+        type_num.push(0);
+        sum += probabilityList[i];
+    }
+    abs_sum = sum;
+    sum -= probabilityList[3]
+
+    for(i = 0; i < probabilityList.length - 1; i++){
+        type_probability.push(probabilityList[i] / sum);
+        sum -= probabilityList[i];
     }
 
-    for(var i = 0; i < num; i++){
-        remain = probability_sum;
-        category = probabilityList.length - 1;
+    type_probability[3] = probabilityList[3] / abs_sum;
+    if(Math.random() < type_probability[3]){
+        type_num[3]++;
+        num--;
+    }
 
-        for(var j = 0; j < probabilityList.length; j++){
-            if(Math.random() < probabilityList[j] / remain){
-                category = j;
+    for(i = 0; i < num; i++){
+        for(j = 0; j < probabilityList.length - 1; j++){
+            if(Math.random() < type_probability[j]){
+                type_num[j]++;
                 break;
             }
-            remain -= probabilityList[j];
+        }
+    }
+    var detail;
+    var companyCheck;
+    for(i = 0; i < type_num.length; i++){
+        switch(i){
+            case 0:
+                companyCheck = getCompanyCheck(type_num[i], 2);
+                for(j = 0; j < companyCheck.length; j++){
+                    if(companyCheck[j] == 1){
+                        encounterList.push(new encounter(i, j, Math.floor(Math.random() * 2), turn));
+                    }
+                }
+                break;
+            case 1:
+            case 2:
+                companyCheck = getCompanyCheck(type_num[i], 1);
+                for(j = 0; j < companyCheck.length; j++){
+                    if(companyCheck[j] == 1){
+                        if(i == 1){
+                            detail = Math.floor(Math.random() * 2);
+                        }else{
+                            detail = Math.floor(Math.random() * 40 + 30);
+                        }
+                        encounterList.push(new encounter(i, j, detail, turn));
+                    }
+                }
+                break;
+            case 3:
+                for(j = 0; j < type_num[i]; j++){
+                    encounterList.push(new encounter(3, 1, Math.floor(Math.random() * 2), turn));
+                }
+                break;
         }
 
-        switch(category){
-            case 0: // cate
-                target = Math.floor(Math.random() * (cateList.length));
-                detail = Math.floor(Math.random() * 2);
-                break;
-            case 1: // specific
-                target = Math.floor(Math.random() * (companyList.length));
-                detail = Math.floor(Math.random() * 2);
-                break;        
-            case 2: // tendency
-                target = Math.floor(Math.random() * (companyList.length));
-                detail = Math.floor(Math.random() * 100) + 1;
-                break;
-            case 3: // kospi
-                target = 1;
-                detail = Math.floor(Math.random() * 2);
-                break;
-        }
-        encounterList.push(new encounter(category, target, detail, Math.floor(Math.random() * 5)));
     }
+}
+
+function getCompanyCheck(num, mode){ //1 : company, 2 : category
+    var companyCheck = [];
+    var remain;
+    var remain_org;
+
+    var temp;
+    var i, j;
+    var count;
+    if(mode == 1){
+        remain = companyList.length;
+    }else if(mode == 2){
+        remain = cateList.length;
+    }
+
+    for(i = 0; i < remain; i++){
+        companyCheck.push(0);
+    }
+    remain_org = remain;
+    for(i = 0; i < num; i++){
+        temp = Math.floor(Math.random() * remain);
+        count = 0;
+        for(j = 0; j < remain_org; j++){
+            if(companyCheck[j] == 1)
+                continue;
+            if(count == temp){
+                companyCheck[j] = 1;
+                break;
+            }
+            count++;
+        }
+        remain--;
+    }
+
+    return companyCheck;
 }
 
 function setMoney(player, money){
@@ -424,21 +523,6 @@ function setMoney(player, money){
     }else{
         userList[player].money = money;
     }
-}
-
-function nextTurn(){
-    console.log(turnCount + " 턴 종료");
-    changeStockPrice();
-    eventAction();
-    playerAction();
-    
-    for(var i = 0; i < userList.length; i++){
-        userList[i].isReady = false;
-    }
-
-    turnCount++;
-    console.log(turnCount + " 턴 시작");
-    io.emit('nextTurn');
 }
 
 function playerAction(){
@@ -484,12 +568,54 @@ function playerAction(){
 }
 
 function eventAction(){
+    var endIndex;
+    var i, j;
+    for(i = 0; i < encounterList.length; i++){
+        if(turnCount < encounterList[i].turn){
+            endIndex = i;
+            break;
+        }
+    }
+    for(i = 0; i < endIndex; i++){
+        switch(encounterList[i].category){
+            case 0:
+                for(j = 0; j < companyList.length; j++){
+                    if(companyList[j].category == cateList[encounterList[i].target]){
+                        eventPriceChange(j, encounterList[i].detail);
+                        break;
+                    }
+                }
+                break;
+            case 1:
+                eventPriceChange(encounterList[i].target, encounterList[i].detail);
+                break;
+            case 2:
+                companyList[encounterList[i].target].tendency += encounterList[i].detail;
+                if(companyList[encounterList[i].target].tendency > 100){
+                    companyList[encounterList[i].target].tendency -= 100;
+                }
+                break;
+            case 3:
+                break;
+            default:
+                console.log("??");
+        }
+    }
 
+}
+
+function eventPriceChange(index, detail){
+    var sensitive;
+    if(detail == 0){
+        sensitive = companyList[index].soundness * (-1);
+    }else{
+        sensitive = companyList[index].vision;
+    }
+    companyList[index].price = Math.floor(companyList[index].price * (1 + ((Math.random() * 0.5 + 0.5) * sensitive / 300)));
 }
 
 function changeStockPrice(){
     for(var i = 0; i < companyList.length; i++){
-        companyList[i].prevPrice = companyList[i].price;
-        companyList[i].price = Math.floor(companyList[i].prevPrice * (1 + ((companyList[i].tendency - 30) / 1500 + ((0.5 - Math.random()) / 500 * companyList[i].variability))));
+        companyList[i].price = Math.floor(companyList[i].price * (1 + ((companyList[i].tendency - 30) / 1500 + ((0.5 - Math.random()) / 500 * companyList[i].variability))));
     }
 }
