@@ -484,7 +484,7 @@ function playerAction(){
 }
 
 function eventAction(){
-    
+
 }
 
 function changeStockPrice(){

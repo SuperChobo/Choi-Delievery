@@ -58,11 +58,11 @@
             var socket = io();
 
             socket.on('skipLogin', function(){
-                location.replace(document.URL + '/next');
+                location.replace(document.URL + '/../login/next');
             });
 
             socket.on('loginSuccess', function(){
-                location.replace(document.URL + '/next');
+                location.replace(document.URL + '/../login/next');
             });
             
             var btn_login = document.getElementById("btn_login");
