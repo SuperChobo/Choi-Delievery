@@ -2,7 +2,7 @@ function o_companyList(){
     var output = [];
     var temp;
     var temp2;
-
+    tabDepth[1] = 1;
     output.push("<회사번호를 입력하시오>");
     for(var i = 0; i < companyList.length; i++){
         temp = (i + 1) + ". " + companyList[i].name + " [" + companyList[i].category + "]&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[i].price, companyList[i].prevPrice);
@@ -10,7 +10,7 @@ function o_companyList(){
             if(have[j].name == companyList[i].name){
                 temp2 = Math.floor(have[j].totalPrice / have[j].num);
                 if(have[j].num > 0)
-                    temp += "&emsp;평단가: " + printPriceChange(temp2, companyList[i].price) + " <sub>" + have[j].num + "주</sub>"; 
+                    temp += "&emsp;평단가: " + printPriceChange(temp2, companyList[i].price, true) + " <sub>" + have[j].num + "주</sub>"; 
                 break;
             }
         }
@@ -23,7 +23,7 @@ function o_companyList(){
 
 function o_companyInfo(index){
     var output = [];
-
+    tabDepth[1] = 2;
     output.push((index + 1) + ". " + companyList[index].name + " [ " + companyList[index].category + " ] "+ "&emsp;&emsp;&emsp;" + "주가 : " + printPriceChange(companyList[index].price, companyList[index].prevPrice) + "&emsp;" + printHaveAmouont(index));
     output.push("<br>");
     output.push("- 건전성 : " + companyList[index].soundness);
@@ -40,9 +40,16 @@ function o_companyInfo(index){
     return output.join("<br>");
 }
 
-function printPriceChange(price, prevPrice){
+function printPriceChange(price, prevPrice, inverse = false){
     var change;
     var temp = price + " "
+    var temp2;
+
+    if(inverse){
+        temp2 = price;
+        price = prevPrice;
+        prevPrice = temp2;
+    }
 
     if(price > prevPrice){
         change = '<a style="color:rgb(230,100,100)">↑';
@@ -208,6 +215,7 @@ function inputFlow(){
         }
     }
     fillRTData();
+    textArea.focus();
     textArea.value = "";
 }
 
@@ -218,7 +226,6 @@ function i_investion(){
         case 1: //주가정보
             if(textArea.value > 0 && textArea.value <= companyList.length){
                 document.getElementById("tabtwoza").innerHTML = o_companyInfo(textArea.value - 1);
-                tabDepth[1]++;
                 investIndex[0] = textArea.value - 1
             }
             break;
@@ -231,7 +238,7 @@ function i_investion(){
                     }
                     if(hp != maxHP && !isTurnInvest){
                         alert("행동력이 부족합니다.");
-                        break;
+                        return;
                     }
 
                     output.push("<구매할 수량을 입력하여 주십시오. (0을 입력시 처음으로)>");
@@ -277,7 +284,6 @@ function i_investion(){
         case 3: //구매, 판매
             if(textArea.value == '0'){
                 document.getElementById("tabtwoza").innerHTML = o_companyList();
-                tabDepth[1] = 1;
                 break;
             }else{
                 switch(investIndex[2]){
@@ -292,7 +298,6 @@ function i_investion(){
                             actionList.push(new action(1, investIndex[0], textArea.value));     
                             alert("구매 예약 완료되었습니다.");
                             document.getElementById("tabtwoza").innerHTML = o_companyList();
-                            tabDepth[1] = 1;
                         }
                         break;
                     case 2: //판매
@@ -311,7 +316,6 @@ function i_investion(){
                             actionList.push(new action(2, investIndex[0], textArea.value));
                             alert("판매 예약 완료되었습니다.");
                             document.getElementById("tabtwoza").innerHTML = o_companyList();
-                            tabDepth[1] = 1;
                         }
                         break;
                 }
@@ -353,9 +357,7 @@ function i_development(){
 }
 
 btnSubmit.onclick = function(){
-    if(onGoing){
-        inputFlow();
-    }
+    inputFlow();
 }
 
 textArea.onkeydown = function(e){
@@ -366,24 +368,21 @@ document.getElementById("btnSkip").onclick = function(){
     ready();
 }
 
-textArea.onkeyup = function(e){
-    if(e.keyCode == 13){ //key ENTER
-        textArea.value = "";
+window.onkeyup = function(e){
+    switch(e.keyCode){
+        case 13: //key ENTER
+            textArea.value="";
+            break;
     }
-}
-
-window.onkeydown = function(e){
-
 }
 
 window.onkeydown = function(e){
     if(document.getElementById("textArea") == document.activeElement){
         switch(e.keyCode){
         case 13: //key ENTER
-            if(onGoing)
-                inputFlow();
+            inputFlow();
             break;
-        case 27:
+        case 27: 
             document.getElementById("textArea").blur();
             break;
         }   
@@ -411,6 +410,9 @@ window.onkeydown = function(e){
             $('#'+tempTab).addClass('current');
             $('#'+tempTab+'1').addClass('current');
             nowTab = tempTab
+            if(tabDepth[1] > 1){
+                document.getElementById("tabtwoza").innerHTML = o_companyList();
+            }
             break;
         default:
         }
